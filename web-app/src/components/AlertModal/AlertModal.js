@@ -1,15 +1,14 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Modal from 'react-modal';
 
 import { SHARED_MODAL_STYLES } from '../../shared/constants';
 import closeButton from '../../assets/closeButton.png';
-import googlePlayImage from '../../assets/google-play-badge.png';
-import iosAppStoreImage from '../../assets/Download_on_the_App_Store_Badge_US-UK_135x40.svg';
 
 import './AlertModal.css';
 
-const AlertModal = ({ message, isOpen, onClick }) =>
-  (<Modal isOpen={isOpen} style={SHARED_MODAL_STYLES} contentLabel="">
+const AlertModal = ({ message, isOpen, onClick }) => (
+  <Modal isOpen={isOpen} style={SHARED_MODAL_STYLES} contentLabel="">
     <button className="Shared-modal-close-button" onClick={onClick}>
       <img src={closeButton} alt="" />
     </button>
@@ -20,6 +19,13 @@ const AlertModal = ({ message, isOpen, onClick }) =>
         </span>
       </div>
     </div>
-  </Modal>);
+  </Modal>
+);
+
+AlertModal.propTypes = {
+  message: PropTypes.string.isRequired,
+  isOpen: PropTypes.bool.isRequired,
+  onClick: PropTypes.func.isRequired,
+};
 
 export default AlertModal;
