@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import {
@@ -63,14 +64,26 @@ class App extends Component {
     }
 
     return (
-      <div className="App" onClick={this.props.hidePopover}>
+      <div className="App" role="presentation" onClick={this.props.hidePopover}>
         <Router />
         <AuthModal isOpen={modalIsOpen} onClick={this.closeModal} />
-        <LockedModal isOpen={lockedModalIsOpen} onClick={this.handleLockedModalClose} />
+        <LockedModal
+          isOpen={lockedModalIsOpen}
+          onClick={this.handleLockedModalClose}
+        />
       </div>
     );
   }
 }
+
+App.propTypes = {
+  fetchProfile: PropTypes.func.isRequired,
+  modalIsOpen: PropTypes.bool.isRequired,
+  lockedModalIsOpen: PropTypes.bool.isRequired,
+  hideModal: PropTypes.func.isRequired,
+  toggleLockedModal: PropTypes.func.isRequired,
+  hidePopover: PropTypes.func.isRequired,
+};
 
 const mapStateToProps = state => ({
   isAuthenticated: !!userSelectors.getUserToken(state),
