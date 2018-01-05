@@ -1,15 +1,17 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Modal from 'react-modal';
 
 import { SHARED_MODAL_STYLES } from '../../shared/constants';
 import closeButton from '../../assets/closeButton.png';
 import googlePlayImage from '../../assets/google-play-badge.png';
-import iosAppStoreImage from '../../assets/Download_on_the_App_Store_Badge_US-UK_135x40.svg';
+import iosAppStoreImage from
+  '../../assets/Download_on_the_App_Store_Badge_US-UK_135x40.svg';
 
 import './AuthModal.css';
 
-const AuthModal = ({ isOpen, onClick }) =>
-  (<Modal isOpen={isOpen} style={SHARED_MODAL_STYLES} contentLabel="">
+const AuthModal = ({ isOpen, onClick }) => (
+  <Modal isOpen={isOpen} style={SHARED_MODAL_STYLES} contentLabel="">
     <button className="Shared-modal-close-button" onClick={onClick}>
       <img src={closeButton} alt="" />
     </button>
@@ -17,7 +19,8 @@ const AuthModal = ({ isOpen, onClick }) =>
       <div className="NoAuthorization-modal">
         <span className="NoAuthorization-modal-title">
           {
-            "You don't have the required permissions to access the admin dashboard."
+            'You don\'t have the required permissions to access'
+            + 'the admin dashboard.'
           }
         </span>
         <span className="NoAuthorization-modal-subtitle">
@@ -32,6 +35,7 @@ const AuthModal = ({ isOpen, onClick }) =>
             <img src={googlePlayImage} alt="" width="150px" />
           </a>
           <a
+            // eslint-disable-next-line max-len
             href="https://itunes.apple.com/us/app/world-cleanup/id1237553057?ls=1&mt=8"
             target="_blank"
             rel="noopener noreferrer"
@@ -48,6 +52,12 @@ const AuthModal = ({ isOpen, onClick }) =>
         </span>
       </div>
     </div>
-  </Modal>);
+  </Modal>
+);
+
+AuthModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClick: PropTypes.func.isRequired,
+};
 
 export default AuthModal;
