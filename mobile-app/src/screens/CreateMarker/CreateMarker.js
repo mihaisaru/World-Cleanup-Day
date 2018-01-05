@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { MessageBarManager } from 'react-native-message-bar';
+import { NavigationActions } from 'react-navigation';
 import {
   BackHandler,
   StatusBar,
@@ -14,6 +15,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { compose } from 'recompose';
 import { translate } from 'react-i18next';
+import { debounce } from 'lodash';
 
 import { operations as appOps, selectors as appSels } from '../../reducers/app';
 
@@ -28,7 +30,11 @@ import { LocationPicker } from './components/LocationPicker';
 import { StatusPicker } from './components/StatusPicker';
 import { PhotoPicker } from '../../components/PhotoPicker';
 import { Divider } from '../../components/Divider';
-import { getWidthPercentage, getHeightPercentage, handleSentryError } from '../../shared/helpers';
+import {
+  getWidthPercentage,
+  getHeightPercentage,
+  handleSentryError,
+} from '../../shared/helpers';
 import { Tags } from '../../components/Tags';
 import { AmountPicker, AMOUNT_STATUSES } from '../../components/AmountPicker';
 import { CongratsModal } from './components/CongratsModal';
@@ -42,25 +48,16 @@ import {
   operations as trashpileOperations,
   selectors as trashpileSelectors,
 } from '../../reducers/trashpile';
-import _ from 'lodash';
 import styles from './styles';
-import { NavigationActions } from 'react-navigation'
 
 const ALERT_CHECK_IMG = require('./alert_check.png');
 
 const MAX_HASHTAGS_NO = 15;
 const GRADIENT_COLORS = ['#FFFFFF', '#F1F1F1'];
-const PADDING_SIZE20 = getWidthPercentage(20);
 const HEIGHT_SIZE15 = getHeightPercentage(15);
 const HEIGHT_SIZE20 = getHeightPercentage(20);
 
 class CreateMarker extends Component {
-  static propTypes = {
-    navigation: PropTypes.object.isRequired,
-    createMarker: PropTypes.func.isRequired,
-    takePhotoAsync: PropTypes.func.isRequired,
-  };
-
   constructor(props) {
     super(props);
 
@@ -101,7 +98,7 @@ class CreateMarker extends Component {
     }, 4000);
 
     this.handleBackPress = this.handleBackPress.bind(this);
-    this.handleTrashpointCreate = _.debounce(
+    this.handleTrashpointCreate = debounce(
       this.handleTrashpointCreate,
       2000,
       {
@@ -117,19 +114,18 @@ class CreateMarker extends Component {
     BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
   }
 
-  componentWillUnmount() {
-    BackHandler.removeEventListener('hardwareBackPress', this.handleBackPress);
-  }
-
-
   componentWillReceiveProps(nextProps) {
     const { isConnected: wasConnected } = this.props;
-    const { isConnected} = nextProps;
+    const { isConnected } = nextProps;
     const { address, locationSetByUser } = this.state;
     if (!wasConnected && isConnected && !locationSetByUser &&
       (!address || !address.completeAddress)) {
       this.fetchAddressAsync();
     }
+  }
+
+  componentWillUnmount() {
+    BackHandler.removeEventListener('hardwareBackPress', this.handleBackPress);
   }
 
   fetchAddressAsync = async (coords) => {
@@ -155,7 +151,7 @@ class CreateMarker extends Component {
     const { navigation } = this.props;
     navigation.dispatch(NavigationActions.reset({
       index: 0,
-      actions: [NavigationActions.navigate({ routeName: 'Tabs' })]
+      actions: [NavigationActions.navigate({ routeName: 'Tabs' })],
     }));
     return true;
   }
@@ -204,7 +200,7 @@ class CreateMarker extends Component {
             ],
           });
         })
-        .catch((err) => handleSentryError(err));
+        .catch(err => handleSentryError(err));
   };
 
   handlePhotoDelete = (index) => {
@@ -269,9 +265,11 @@ class CreateMarker extends Component {
         status,
         photos,
         composition: [
-          ...trashCompositionTypes.filter(t => t.selected).map(t => t.type),
+          ...trashCompositionTypes
+            .filter(type => type.selected)
+            .map(type => type.type),
         ],
-        hashtags: [...hashtags.map(t => t.label)],
+        hashtags: [...hashtags.map(type => type.label)],
         amount: AMOUNT_STATUSES[amount],
         address: completeAddress,
         name: `${streetAddress} ${streetNumber}`,
@@ -340,7 +338,7 @@ class CreateMarker extends Component {
     );
 
     if (hashtagAlreadyExists) {
-      return this.setState({
+      this.setState({
         temporaryHashtag: '',
       });
     }
@@ -382,10 +380,9 @@ class CreateMarker extends Component {
       validation = false,
       validationText,
       congratsShown,
-      initialLocation,
       editableLocation,
       address = {},
-      disableCreateTrashpointButton
+      disableCreateTrashpointButton,
     } = this.state;
     const addHashtagTextStyle = {};
     if (hashtags.length === MAX_HASHTAGS_NO) {
@@ -478,34 +475,6 @@ class CreateMarker extends Component {
             </View>
           </View>
           <Divider />
-          {/* <View style={{ padding: PADDING_SIZE20 }}>*/}
-          {/* <Text style={styles.trashtypesText}>*/}
-          {/* Something extra to report*/}
-          {/* </Text>*/}
-          {/* <Text style={styles.notesText}>*/}
-          {/* Is this garbage in a difficult place to reach, a recurring dumping*/}
-          {/* zone or something else?*/}
-          {/* </Text>*/}
-          {/* <View style={styles.containerBtnNote}>*/}
-          {/* <TouchableHighlight*/}
-          {/* onPress={() => {}}*/}
-          {/* underlayColor="transparent"*/}
-          {/* activeOpacity={1}*/}
-          {/* >*/}
-          {/* <View style={[styles.addTagContainer]}>*/}
-          {/* <LinearGradient*/}
-          {/* style={styles.addReportLinearGradient}*/}
-          {/* colors={GRADIENT_COLORS}*/}
-          {/* >*/}
-          {/* <Text style={styles.addTagText}>*/}
-          {/* Leave a note*/}
-          {/* </Text>*/}
-          {/* </LinearGradient>*/}
-          {/* </View>*/}
-          {/* </TouchableHighlight>*/}
-          {/* </View>*/}
-          {/* </View>*/}
-          {/* <Divider />*/}
           <View style={styles.bottomContainer}>
             <Button
               style={styles.createButton}
@@ -519,6 +488,19 @@ class CreateMarker extends Component {
     );
   }
 }
+
+CreateMarker.defaultProps = {
+  isConnected: false,
+};
+
+CreateMarker.propTypes = {
+  t: PropTypes.func.isRequired,
+  setErrorMessage: PropTypes.func.isRequired,
+  isConnected: PropTypes.bool,
+  navigation: PropTypes.object.isRequired,
+  createMarker: PropTypes.func.isRequired,
+  takePhotoAsync: PropTypes.func.isRequired,
+};
 
 const mapDispatch = {
   createMarker: trashpileOperations.createMarker,
