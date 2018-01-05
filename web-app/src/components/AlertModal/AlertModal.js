@@ -22,8 +22,12 @@ const AlertModal = ({ message, isOpen, onClick }) => (
   </Modal>
 );
 
+AlertModal.defaultProps = {
+  message: '',
+};
+
 AlertModal.propTypes = {
-  message: PropTypes.string.isRequired,
+  message: PropTypes.string,
   isOpen: PropTypes.bool.isRequired,
   onClick: PropTypes.func.isRequired,
 };
