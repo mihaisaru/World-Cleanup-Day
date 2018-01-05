@@ -21,7 +21,8 @@ export default {
   },
   fetchAddress: async ({ latitude, longitude }) => {
     const { data } = await axios.get(
-      `${GOOGLE_GEOCODE_API_URL}?key=${API_KEY}&latlng=${latitude},${longitude}`,
+      `${GOOGLE_GEOCODE_API_URL}`
+      + `?key=${API_KEY}&latlng=${latitude},${longitude}`,
     );
     let completeAddress = '';
     let streetAddress = '';
@@ -32,22 +33,23 @@ export default {
 
     if (data && data.results && data.results.length > 0) {
       completeAddress = data.results[0].formatted_address;
-      data.results[0].address_components.forEach(({ types, long_name }) => {
-        if (types.indexOf('route') !== -1) {
-          streetAddress = long_name;
-        } else if (types.indexOf('street_number') !== -1) {
-          streetNumber = long_name;
-        } else if (types.indexOf('locality') !== -1) {
-          locality = long_name;
-        } else if (types.indexOf('country') !== -1) {
-          country = long_name;
-        } else if (types.indexOf('sublocality') !== -1) {
-          subLocality = long_name;
-        }
-        if (types.indexOf('street_address') !== -1 && !streetAddress) {
-          streetAddress = long_name;
-        }
-      });
+      data.results[0].address_components
+        .forEach(({ types, long_name: longName }) => {
+          if (types.indexOf('route') !== -1) {
+            streetAddress = longName;
+          } else if (types.indexOf('street_number') !== -1) {
+            streetNumber = longName;
+          } else if (types.indexOf('locality') !== -1) {
+            locality = longName;
+          } else if (types.indexOf('country') !== -1) {
+            country = longName;
+          } else if (types.indexOf('sublocality') !== -1) {
+            subLocality = longName;
+          }
+          if (types.indexOf('street_address') !== -1 && !streetAddress) {
+            streetAddress = longName;
+          }
+        });
     }
     if (!streetAddress && subLocality && locality) {
       streetAddress = `${subLocality}, ${locality}`;
