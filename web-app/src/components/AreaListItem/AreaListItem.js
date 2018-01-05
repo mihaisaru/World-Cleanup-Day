@@ -23,6 +23,7 @@ class AreaListItem extends React.Component {
     }
     return containerStyle;
   };
+
   getToggleStyle = () => {
     const { area } = this.props;
     const hasChildren = area.children && area.children.length > 0;
@@ -31,6 +32,7 @@ class AreaListItem extends React.Component {
     }
     return {};
   };
+
   handleCollapseToggleClick = () => {
     if (!this.props.area.children || this.props.area.children.length === 0) {
       return;
@@ -58,7 +60,9 @@ class AreaListItem extends React.Component {
     const isUserAreas = match && match.path && match.path === '/user-areas';
     let areaName = area.name;
     if (isUserAreas) {
-      const name = COUNTRIES_HASH[getCountryFromStr(area.parentId ? area.parentId : area.id)];
+      const name = COUNTRIES_HASH[
+        getCountryFromStr(area.parentId ? area.parentId : area.id)
+      ];
       if (name) {
         areaName = name;
       }
@@ -67,7 +71,7 @@ class AreaListItem extends React.Component {
     return (
       <div>
         <div style={this.getContainerStyle()} className="AreaListItem">
-          <div
+          <button
             onClick={this.handleCollapseToggleClick}
             className="AreaListItem-toggle-container"
             style={this.getToggleStyle()}
@@ -94,14 +98,14 @@ class AreaListItem extends React.Component {
                 {areaName}
               </span>
             </div>
-          </div>
+          </button>
 
-          <div
+          <button
             onClick={() => onClick(area)}
             className="AreaListItem-trashlist-button"
           >
             {this.renderRightLabel()}
-          </div>
+          </button>
         </div>
         {hasChildren && !isUserAreas &&
         <Collapse isOpened={this.state.isOpen}>
@@ -120,15 +124,23 @@ class AreaListItem extends React.Component {
     );
   }
 }
+
 AreaListItem.defaultProps = {
   leftPadding: 0,
   rightLabel: undefined,
+  match: {},
 };
+
 AreaListItem.propTypes = {
   onClick: PropTypes.func.isRequired,
-  area: PropTypes.object.isRequired,
+  area: PropTypes.shape({
+    children: PropTypes.array,
+    trashCount: PropTypes.number,
+  }).isRequired,
+  match: PropTypes.object, // eslint-disable-line react/forbid-prop-types
   index: PropTypes.number.isRequired,
   leftPadding: PropTypes.number,
   rightLabel: PropTypes.oneOf(PropTypes.func, PropTypes.string),
 };
+
 export default AreaListItem;
