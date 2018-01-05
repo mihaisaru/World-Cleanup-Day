@@ -49,6 +49,7 @@ class TrashpointList extends Component {
       leading: true,
     });
   }
+
   componentWillMount() {
     const { page, pageSize, loaded } = this.state;
     this.props
@@ -69,8 +70,12 @@ class TrashpointList extends Component {
     if (!id) {
       return;
     }
-    this.props.history.push(`/trashpoints/${id}?focus=y`, {selectedArea: this.props.selectedArea});
+    this.props.history.push(
+      `/trashpoints/${id}?focus=y`,
+      { selectedArea: this.props.selectedArea },
+    );
   };
+
   handleLoadMore = () => {
     if (!this.props.canLoadMore) {
       return;
@@ -89,6 +94,7 @@ class TrashpointList extends Component {
       },
     );
   };
+
   renderItems() {
     const { trashpoints = [] } = this.props;
     return trashpoints.map(t =>
@@ -103,6 +109,7 @@ class TrashpointList extends Component {
 
   renderStatusCounts = () => {
     const { statusCounts } = this.props;
+    console.log('Status Counts: ', statusCounts);
     if (!statusCounts) {
       return null;
     }
@@ -156,6 +163,30 @@ class TrashpointList extends Component {
   }
 }
 
+TrashpointList.defaultProps = {
+  trashpoints: [],
+  canLoadMore: false,
+  statusCounts: {},
+};
+
+TrashpointList.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
+  trashpoints: PropTypes.array.isRequired,
+  // eslint-disable-next-line react/forbid-prop-types
+  history: PropTypes.object.isRequired,
+  selectedArea: PropTypes.shape({
+    id: PropTypes.string,
+  }).isRequired,
+  fetchTrashpoints: PropTypes.func.isRequired,
+  loading: PropTypes.bool.isRequired,
+  canLoadMore: PropTypes.bool,
+  statusCounts: PropTypes.shape({
+    cleaned: PropTypes.number,
+    regular: PropTypes.number,
+    threat: PropTypes.number,
+  }),
+};
+
 const mapState = state => ({
   trashpoints: selectors.getAreasTrashpoints(state),
   loading: selectors.getAdminTrashpointsLoading(state),
@@ -166,12 +197,5 @@ const mapState = state => ({
 const mapDispatch = dispatch => ({
   fetchTrashpoints: params => dispatch(actions.fetchAreaTrashpoints(params)),
 });
-
-TrashpointList.propTypes = {
-  trashpoints: PropTypes.array.isRequired,
-  fetchTrashpoints: PropTypes.func.isRequired,
-  loading: PropTypes.bool.isRequired,
-  canLoadMore: PropTypes.bool.isRequired,
-};
 
 export default connect(mapState, mapDispatch)(TrashpointList);
