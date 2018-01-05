@@ -5,6 +5,7 @@ import { ImagePicker, Constants, Permissions } from 'expo';
 import i18n from '../config/i18n';
 
 import { AlertModal } from '../components/AlertModal';
+
 const checkPermissions = async () => {
   const { status } = await Permissions.getAsync(Permissions.CAMERA);
 
@@ -34,10 +35,12 @@ export const withCameraService = () => (Component) => {
         },
       ];
     }
+
     static childContextTypes = {
       pickPhotoAsync: PropTypes.func.isRequired,
       takePhotoAsync: PropTypes.func.isRequired,
     };
+
     getChildContext() {
       const { pickPhotoAsync, takePhotoAsync } = this;
       return {
@@ -45,6 +48,7 @@ export const withCameraService = () => (Component) => {
         takePhotoAsync,
       };
     }
+
     pickPhotoAsync = async (options) => {
       const permitted = await checkPermissions();
       if (!permitted) {
@@ -53,6 +57,7 @@ export const withCameraService = () => (Component) => {
       }
       return ImagePicker.launchImageLibraryAsync(options);
     };
+
     takePhotoAsync = async (options) => {
       const permitted = await checkPermissions();
       if (!permitted) {
@@ -64,11 +69,13 @@ export const withCameraService = () => (Component) => {
       }
       return ImagePicker.launchCameraAsync(options);
     };
+
     showWarning = () => {
       this.setState({
         warning: true,
       });
     };
+
     hideWarning = () => {
       this.setState({
         warning: false,
@@ -95,12 +102,14 @@ export const withCameraService = () => (Component) => {
     }
   };
 };
+
 export const withCameraActions = () => (Component) => {
   return class extends React.Component {
     static contextTypes = {
       takePhotoAsync: PropTypes.func.isRequired,
       pickPhotoAsync: PropTypes.func.isRequired,
     };
+
     render() {
       const { takePhotoAsync, pickPhotoAsync } = this.context;
       return (

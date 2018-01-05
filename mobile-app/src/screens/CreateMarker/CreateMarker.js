@@ -490,7 +490,7 @@ class CreateMarker extends Component {
 }
 
 CreateMarker.defaultProps = {
-  isConnected: false,
+  isConnected: true,
 };
 
 CreateMarker.propTypes = {
