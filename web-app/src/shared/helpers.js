@@ -1,4 +1,7 @@
+/* eslint-disable no-mixed-operators */
+
 import { GRID_VALUES, GRID_HASH } from './constants';
+
 export const noop = () => {};
 
 export const getViewportPoints = bounds => {
@@ -6,22 +9,6 @@ export const getViewportPoints = bounds => {
   const nw = { longitude: b.b, latitude: f.b };
   const se = { longitude: b.f, latitude: f.f };
   return { nw, se };
-};
-
-export const debounce = (func, wait, immediate) => {
-  let timeout;
-  return function () {
-    let context = this,
-      args = arguments;
-    const later = function () {
-      timeout = null;
-      if (!immediate) func.apply(context, args);
-    };
-    const callNow = immediate && !timeout;
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-    if (callNow) func.apply(context, args);
-  };
 };
 
 export const getDistanceBetweenPointsInMeters = (lat1, lon1, lat2, lon2) => {
@@ -35,8 +22,8 @@ export const getDistanceBetweenPointsInMeters = (lat1, lon1, lat2, lon2) => {
   return 12742 * Math.asin(Math.sqrt(a)) * 1000; // 2 * R; R = 6371 km
 };
 
-export const getGridValue = diagonaleInMeters => {
-  // console.log(diagonaleInMeters);
+/* eslint-disable consistent-return */
+export const getGridValue = (diagonaleInMeters) => {
   const length = GRID_VALUES.length;
   const lastIndex = length - 1;
 
@@ -47,6 +34,7 @@ export const getGridValue = diagonaleInMeters => {
     };
   }
 
+  // eslint-disable-next-line no-plusplus
   for (let i = 0; i < length; i++) {
     if (diagonaleInMeters <= GRID_VALUES[i]) {
       let previousIndex = i - 1;
@@ -61,6 +49,7 @@ export const getGridValue = diagonaleInMeters => {
     }
   }
 };
+/* eslint-enable consistent-return */
 
 function s4() {
   return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
@@ -73,19 +62,20 @@ export const toDegrees = no => no * 180 / Math.PI;
 export const destinationPoint = (fromPoint,
   distance,
   bearing,
-  radius = 6371e3,) => {
+  radius = 6371e3,
+) => {
   const δ = distance / radius; // angular distance in radians
   const θ = toRadians(bearing);
 
   const φ1 = toRadians(fromPoint.latitude);
   const λ1 = toRadians(fromPoint.longitude);
 
-  const sinOmega1 = Math.sin(φ1),
-    cosOmega1 = Math.cos(φ1);
-  const sineTeta = Math.sin(δ),
-    cosTeta = Math.cos(δ);
-  const sinTeta1 = Math.sin(θ),
-    cosTeta1 = Math.cos(θ);
+  const sinOmega1 = Math.sin(φ1);
+  const cosOmega1 = Math.cos(φ1);
+  const sineTeta = Math.sin(δ);
+  const cosTeta = Math.cos(δ);
+  const sinTeta1 = Math.sin(θ);
+  const cosTeta1 = Math.cos(θ);
 
   const sinOmega2 = sinOmega1 * cosTeta + cosOmega1 * sineTeta * cosTeta1;
   const φ2 = Math.asin(sinOmega2);
@@ -109,6 +99,8 @@ const atob = input => {
   const str = input.replace(/=+$/, '');
   let output = '';
 
+
+  /* eslint-disable */
   for (
     let bc = 0, bs = 0, buffer, i = 0;
     (buffer = str.charAt(i++));
@@ -118,16 +110,18 @@ const atob = input => {
   ) {
     buffer = chars.indexOf(buffer);
   }
+  /* eslint-enable */
 
   return output;
 };
 
 export const convertToByteArray = input => {
-  const binary_string = atob(input);
-  const len = binary_string.length;
+  const binaryString = atob(input);
+  const len = binaryString.length;
   const bytes = new Uint8Array(len);
+  // eslint-disable-next-line no-plusplus
   for (let i = 0; i < len; i++) {
-    bytes[i] = binary_string.charCodeAt(i);
+    bytes[i] = binaryString.charCodeAt(i);
   }
   return bytes;
 };
