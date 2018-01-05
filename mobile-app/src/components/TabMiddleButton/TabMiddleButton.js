@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { View, TouchableWithoutFeedback, Text } from 'react-native';
+import { View, TouchableWithoutFeedback } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { connect } from 'react-redux';
 import { compose } from 'recompose';
@@ -24,19 +24,6 @@ import {
 } from '../../reducers/app';
 
 class TabMiddleButton extends Component {
-  static defaultProps = {
-    onPopoverShow: undefined,
-  };
-  static propTypes = {
-    wasPopoverShown: PropTypes.bool.isRequired,
-    popoverMessage: PropTypes.string.isRequired,
-    onPopoverShow: PropTypes.func,
-    navigation: PropTypes.object.isRequired,
-    locationActive: PropTypes.bool.isRequired,
-    showLocationErrorModal: PropTypes.func.isRequired,
-    takePhotoAsync: PropTypes.func.isRequired,
-  };
-
   constructor(props) {
     super(props);
     this.state = { popoverShow: false };
@@ -55,6 +42,7 @@ class TabMiddleButton extends Component {
       this.props.onPopoverShow();
     }
   };
+
   locationActiveGuard = () => {
     const { locationActive } = this.props;
     if (!locationActive) {
@@ -63,6 +51,7 @@ class TabMiddleButton extends Component {
     }
     return true;
   };
+
   handlePress = async () => {
     if (!this.locationActiveGuard()) {
       return;
@@ -90,9 +79,11 @@ class TabMiddleButton extends Component {
       });
     } catch (e) {
       handleSentryError(e);
+      // eslint-disable-next-line no-console
       console.log(e.message);
     }
   };
+
   handleOnClosePopover = () => {
     this.setState({ showPopover: false });
   };
@@ -116,6 +107,20 @@ class TabMiddleButton extends Component {
   }
 }
 
+TabMiddleButton.defaultProps = {
+  onPopoverShow: undefined,
+};
+
+TabMiddleButton.propTypes = {
+  wasPopoverShown: PropTypes.bool.isRequired,
+  popoverMessage: PropTypes.string.isRequired,
+  onPopoverShow: PropTypes.func,
+  navigation: PropTypes.object.isRequired,
+  locationActive: PropTypes.bool.isRequired,
+  showLocationErrorModal: PropTypes.func.isRequired,
+  takePhotoAsync: PropTypes.func.isRequired,
+};
+
 const mapStateToProps = state => ({
   wasPopoverShown: appSelectors.wasPopoverShown(state),
   popoverMessage: appSelectors.getPopoverMessage(state),
@@ -127,6 +132,7 @@ const mapDispatchToProps = {
   onPopoverShow: appOperations.setPopoverShown,
   showLocationErrorModal: locationOps.setErrorModalVisible,
 };
+
 export default compose(
   connect(mapStateToProps, mapDispatchToProps),
   withCameraActions(),
